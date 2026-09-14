@@ -1,8 +1,8 @@
+import uuid
+from threading import Lock
+
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from threading import Lock
-from typing import List
-import uuid
 
 app = FastAPI()
 

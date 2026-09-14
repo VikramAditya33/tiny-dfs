@@ -1,6 +1,7 @@
+import math
 import os
 import sys
-import math
+
 import requests
 
 MASTER = "http://localhost:8000"
@@ -51,7 +52,7 @@ def upload(local_path, remote_path):
 
                     print(f"{chunk_id} -> " f"{node['id']}")
 
-                except Exception as e:
+                except requests.RequestException as e:
 
                     print(f"Failed replica " f"{node['id']}: {e}")
 
@@ -99,7 +100,7 @@ def download(remote_path, local_path):
 
                     break
 
-                except Exception:
+                except requests.RequestException:
 
                     print(f"{node['id']} unavailable, " f"trying next replica")
 

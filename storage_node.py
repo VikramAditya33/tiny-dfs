@@ -1,8 +1,9 @@
+import asyncio
 import os
-import sys
-import requests
+from pathlib import Path
 
-from fastapi import FastAPI, Request, HTTPException
+import requests
+from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import Response
 
 app = FastAPI()
@@ -34,10 +35,8 @@ def startup():
 async def store_chunk(chunk_id: str, request: Request):
     data = await request.body()
 
-    path = os.path.join(DATA_DIR, chunk_id)
-
-    with open(path, "wb") as f:
-        f.write(data)
+    path = Path(DATA_DIR) / chunk_id
+    await asyncio.to_thread(path.write_bytes, data)
 
     return {"chunk_id": chunk_id, "bytes": len(data)}
 
