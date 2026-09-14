@@ -12,9 +12,7 @@ def upload(local_path, remote_path):
 
     file_size = os.path.getsize(local_path)
 
-    number_of_chunks = math.ceil(
-        file_size / CHUNK_SIZE
-    )
+    number_of_chunks = math.ceil(file_size / CHUNK_SIZE)
 
     metadata = requests.post(
         f"{MASTER}/files",
@@ -22,8 +20,8 @@ def upload(local_path, remote_path):
             "path": remote_path,
             "size": file_size,
             "chunks": number_of_chunks,
-            "replication_factor": 2
-        }
+            "replication_factor": 2,
+        },
     )
 
     metadata.raise_for_status()
@@ -43,60 +41,37 @@ def upload(local_path, remote_path):
 
                 try:
 
-                    url = (
-                        f"{node['url']}"
-                        f"/chunks/{chunk_id}"
-                    )
+                    url = f"{node['url']}" f"/chunks/{chunk_id}"
 
-                    response = requests.put(
-                        url,
-                        data=data,
-                        timeout=30
-                    )
+                    response = requests.put(url, data=data, timeout=30)
 
                     response.raise_for_status()
 
                     successful_replicas += 1
 
-                    print(
-                        f"{chunk_id} -> "
-                        f"{node['id']}"
-                    )
+                    print(f"{chunk_id} -> " f"{node['id']}")
 
                 except Exception as e:
 
-                    print(
-                        f"Failed replica "
-                        f"{node['id']}: {e}"
-                    )
+                    print(f"Failed replica " f"{node['id']}: {e}")
 
             if successful_replicas == 0:
-                raise RuntimeError(
-                    f"Lost chunk {chunk_id}"
-                )
+                raise RuntimeError(f"Lost chunk {chunk_id}")
 
-    print(
-        f"Uploaded {local_path} "
-        f"as {remote_path}"
-    )
+    print(f"Uploaded {local_path} " f"as {remote_path}")
 
 
 def download(remote_path, local_path):
 
     path = remote_path.lstrip("/")
 
-    response = requests.get(
-        f"{MASTER}/files/{path}"
-    )
+    response = requests.get(f"{MASTER}/files/{path}")
 
     response.raise_for_status()
 
     metadata = response.json()
 
-    chunks = sorted(
-        metadata["chunks"],
-        key=lambda c: c["index"]
-    )
+    chunks = sorted(metadata["chunks"], key=lambda c: c["index"])
 
     with open(local_path, "wb") as output:
 
@@ -110,48 +85,28 @@ def download(remote_path, local_path):
 
                 try:
 
-                    url = (
-                        f"{node['url']}"
-                        f"/chunks/{chunk_id}"
-                    )
+                    url = f"{node['url']}" f"/chunks/{chunk_id}"
 
-                    response = requests.get(
-                        url,
-                        timeout=30
-                    )
+                    response = requests.get(url, timeout=30)
 
                     response.raise_for_status()
 
-                    output.write(
-                        response.content
-                    )
+                    output.write(response.content)
 
                     downloaded = True
 
-                    print(
-                        f"{chunk_id} <- "
-                        f"{node['id']}"
-                    )
+                    print(f"{chunk_id} <- " f"{node['id']}")
 
                     break
 
                 except Exception:
 
-                    print(
-                        f"{node['id']} unavailable, "
-                        f"trying next replica"
-                    )
+                    print(f"{node['id']} unavailable, " f"trying next replica")
 
             if not downloaded:
-                raise RuntimeError(
-                    f"No replica available for "
-                    f"{chunk_id}"
-                )
+                raise RuntimeError(f"No replica available for " f"{chunk_id}")
 
-    print(
-        f"Downloaded {remote_path} "
-        f"to {local_path}"
-    )
+    print(f"Downloaded {remote_path} " f"to {local_path}")
 
 
 def main():
@@ -171,17 +126,11 @@ def main():
 
     if operation == "upload":
 
-        upload(
-            sys.argv[2],
-            sys.argv[3]
-        )
+        upload(sys.argv[2], sys.argv[3])
 
     elif operation == "download":
 
-        download(
-            sys.argv[2],
-            sys.argv[3]
-        )
+        download(sys.argv[2], sys.argv[3])
 
     else:
 
