@@ -1,5 +1,5 @@
 ## Tiny Distributed Filesystem
-A distributed file system is used in a distributed system where a client writes/reads a file and is controlled via central metadata engine, which doesn't hold the file but keeps the metadata information such as which block of the file lives in which node and then it points to that particular node where file was distributed and client directly talks with the storage server.
+A distributed file system is used in a distributed system where a client writes/reads a file and is controlled via central metadata engine and with a replication factor of 2. The metadata layer doesn't hold the files but keeps the metadata information such as which block of the file lives in which node and then it points to that particular node where file is distributed and client directly talks with the storage server.
 ### How to use?
 **Step 1:**
 Activate venv first
